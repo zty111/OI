@@ -1,6 +1,8 @@
 ## 添加bits/stdc++.h
 * 打开文件夹
 `cd /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/`
+或
+`cd /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1`
 * 新建文件夹
 `sudo mkdir bits`
 * 在bits中新建文件

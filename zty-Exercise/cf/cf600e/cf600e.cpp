@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int N = 100010;
+const int N = 200010;
 int cnt, to[N], h[N], nxt[N];
 void add_edge(int u, int v) {
     cnt++; to[cnt] = v; nxt[cnt] = h[u]; h[u] = cnt;
@@ -15,10 +15,8 @@ inline int read() {
     while(ch >='0' && ch <='9') x = (x<<3) + (x<<1) + ch - 48, ch = nc();
     return x;
 }
-
-// dsu (树上并查集)
 int son[N], siz[N];
-void dfs1(int u, int fa) { //同树剖
+void dfs1(int u, int fa) {
     siz[u] = 1;
     for(int i = h[u]; i; i = nxt[i]) {
         int v = to[i];
@@ -55,7 +53,6 @@ void dfs2(int u, int fa, int keep) {
     ans[u] = sum[top]; // 统计答案
     if(!keep) upd(u, fa, -1); // 不保留的删除
 }
-
 int n;
 int main() {
     n = read();
