@@ -1,7 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
+typedef long long ll;
 const int N = 100010;
-const int inf = 0x3f3f3f3f;
+const ll inf = (1ll << 60);
 int h[N], nxt[N << 1], to[N << 1], cnt;
 void add_edge(int u, int v) {
     cnt++; nxt[cnt] = h[u]; h[u] = cnt; to[cnt] = v;
@@ -38,15 +39,16 @@ void dfs2(int u, int topf) {
         dfs2(v, v);
     }
 }
-int dp[N][2], ldp[N][2], w[N], n, m;
+ll dp[N][2], ldp[N][2], w[N];
+int n, m;
 void dfs3(int u) {
     ldp[u][1] += w[u];
     for(int i = h[u]; i; i = nxt[i]) {
         int v = to[i];
         if(v == f[u] || v == son[u]) continue;
         dfs3(v);
-        ldp[u][0] += max(dp[v][0], dp[u][1]);
-        ldp[u][1] += dp[u][0];
+        ldp[u][0] += max(dp[v][0], dp[v][1]);
+        ldp[u][1] += dp[v][0];
     }
     dp[u][0] += ldp[u][0];
     dp[u][1] += ldp[u][1];
@@ -56,7 +58,7 @@ void dfs3(int u) {
     dp[u][1] += dp[son[u]][0];
 }
 struct Mat {
-    int m[2][2];
+    ll m[2][2];
     void init() {
         for(int i = 0; i < 2; i++)
             for(int j = 0; j < 2; j++)
@@ -103,7 +105,7 @@ Mat query(int o, int l, int r, int L, int R) {
     if(R < mid + 1) return query(lson, L, R);
     return Mul(query(lson, L, R), query(rson, L, R));
 }
-void change(int u,int ww) {
+void change(int u,ll ww) {
     val[u].m[1][0] += ww - w[u];
     w[u] = ww;
     while(u != 0) {
@@ -112,18 +114,18 @@ void change(int u,int ww) {
         update(1, 1, n, id[u]);
         Mat nw = query(1, 1, n, id[now], ed[now]);
         u = f[now];
-        val[u].m[0][0] += max(nw.m[0][0], nw.m[0][1]) - max(la.m[0][0], la.m[0][1]);
+        val[u].m[0][0] += max(nw.m[0][0], nw.m[1][0]) - max(la.m[0][0], la.m[1][0]);
         val[u].m[0][1] = val[u].m[0][0];
-        val[u].m[1][0] += nw.m[0][0] -la.m[0][0];
+        val[u].m[1][0] += nw.m[0][0] - la.m[0][0];
     }
 }
-long long tot;
+ll tot;
 void solve(int a, int b, int x, int y) {
     if(x) change(a, inf); else change(a, -inf);
     if(y) change(b, inf); else change(b, -inf);
     Mat ans = query(1, 1, n, id[1], ed[1]);
     tot += ((x ^ 1) + (y ^ 1)) * inf;
-    long long Ans = tot - max(ans.m[0][0], ans.m[1][0]);
+    ll Ans = tot - max(ans.m[0][0], ans.m[1][0]);
     tot -= ((x ^ 1) + (y ^ 1)) * inf;
     if(!x) change(a, inf); else change(a, -inf);
     if(!y) change(b, inf); else change(b, -inf);
@@ -139,8 +141,12 @@ int main() {
         add_edge(u, v);
         add_edge(v, u);
     }
+    dfs1(1, 0, 1);
+    dfs2(1, 1);
+    dfs3(1);
+    build(1, 1, n);
     for(int i = 1; i <= m; i++) {
-        int a = read(), b = read(), x = read(), y = read();
+        int a = read(), x = read(), b = read(), y = read();
         solve(a, b, x, y);       
     }
     return 0;
