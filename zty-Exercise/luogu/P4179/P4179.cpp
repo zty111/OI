@@ -24,7 +24,7 @@ Mat Mul(Mat A, Mat B) {
                 C.m[i][j] = max(C.m[i][j], A.m[i][k] + B.m[k][j]);
     return C;
 }
-int h[N], to[N], nxt[N], cnt, wt[N];
+int h[N], to[N << 1], nxt[N << 1], cnt, wt[N];
 void add_edge(int u, int v) {
     cnt++; nxt[cnt] = h[u]; h[u] = cnt; to[cnt] = v;
 }
@@ -79,8 +79,8 @@ void dfs3(int u) {
 #define lson lt, l, mid
 void build(int o, int l, int r) {
     if(l == r) {
-        val[b[l]].m[0][0] = ldp[l][0]; val[b[l]].m[0][1] = ldp[l][0];
-        val[b[l]].m[1][0] = ldp[l][1]; val[b[l]].m[1][1] = -inf;
+        val[b[l]].m[0][0] = ldp[b[l]][0]; val[b[l]].m[0][1] = ldp[b[l]][0];
+        val[b[l]].m[1][0] = ldp[b[l]][1]; val[b[l]].m[1][1] = -inf;
         a[o] = val[b[l]];
         return;
     }
@@ -109,7 +109,7 @@ void change(int u, int w) {
     while(u != 0) {
         int now = top[u];
         Mat la = query(1, 1, n, id[now], ed[now]);
-        update(1, 1, n, id[now]);
+        update(1, 1, n, id[u]);
         Mat nw = query(1, 1, n, id[now], ed[now]);
         u = f[now];
         val[u].m[0][0] += max(nw.m[0][0], nw.m[1][0]) - max(la.m[0][0], la.m[1][0]);
