@@ -106,7 +106,7 @@ Mat query(int o, int l, int r, int L, int R) {
     return Mul(query(lson, L, R), query(rson, L, R));
 }
 void change(int u,ll ww) {
-    val[u].m[1][0] += ww - w[u];
+    val[u].m[1][0] += ww;
     w[u] = ww;
     while(u != 0) {
         int now = top[u];
@@ -121,19 +121,21 @@ void change(int u,ll ww) {
 }
 ll tot;
 void solve(int a, int b, int x, int y) {
-    if(x) change(a, inf); else change(a, -inf);
-    if(y) change(b, inf); else change(b, -inf);
+    if(x) change(a, -inf); else change(a, inf);
+    if(y) change(b, -inf); else change(b, inf);
     Mat ans = query(1, 1, n, id[1], ed[1]);
     tot += ((x ^ 1) + (y ^ 1)) * inf;
     ll Ans = tot - max(ans.m[0][0], ans.m[1][0]);
     tot -= ((x ^ 1) + (y ^ 1)) * inf;
-    if(!x) change(a, inf); else change(a, -inf);
-    if(!y) change(b, inf); else change(b, -inf);
+    if(!x) change(a, -inf); else change(a, inf);
+    if(!y) change(b, -inf); else change(b, inf);
     if(Ans > inf) printf("-1\n");
     else printf("%lld\n", Ans);
 }
 char opt[10];
 int main() {
+    freopen("defense.in", "r", stdin);
+    freopen("defense.out", "w", stdout);
     n = read(); m = read(); scanf("%s", opt);
     for(int i = 1; i <= n; i++) w[i] = read(), tot += w[i];
     for(int i = 1; i < n; i++) {
