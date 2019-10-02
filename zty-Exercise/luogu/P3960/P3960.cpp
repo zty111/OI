@@ -1,107 +1,93 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
-const int INF = 0x3f3f3f3f;
-struct Node{
-    int v,s,cnt=1;
-    Node* ch[2];
-    void maintain(){
-        s=cnt;
-        if(ch[0]!=NULL)s+=ch[0]->s;
-        if(ch[1]!=NULL)s+=ch[1]->s;
-    }
-    int cmp(int x)const{
-        if(v==x)return -1;
-        return x<v?0:1;
-    }
-};
-Node* root=NULL;
-void rotate(Node* &o,int d){
-    Node* k=o->ch[d^1]; o->ch[d^1]=k->ch[d]; k->ch[d]=o;
-    o->maintain(); k->maintain(); o=k;
+#define mid ((l+r)>>1)
+#define lson tr[o].lc, l, mid
+#define rson tr[o].rc, mid + 1, r
+inline char nc() {
+    static char buf[100000], *p1 = buf, *p2 = buf;
+    return p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 100000, stdin), p1 == p2) ? EOF : *p1++;
 }
-void splay(Node* &o,int k){
-    int d=o->cmp(k);
-    if(d!=-1){
-        Node* p=o->ch[d];
-        int d2=p->cmp(k);
-        if(d2!=-1){
-            splay(p->ch[d2],k);
-            if(d==d2)rotate(o,d^1);
-            else rotate(o->ch[d],d);
+inline int read() {
+    int x = 0; char ch = getchar();
+    while(ch > '9' || ch < '0') ch = getchar();
+    while(ch <= '9' && ch >= '0') x = x * 10 + ch - 48, ch = getchar();
+    return x;
+}
+const int N = 3e6 + 5;
+struct tree {
+    int lc, rc;
+    int siz;
+    long long val;
+}tr[N * 12];
+int n, m, q, x, y, root[N], tot, M, rt, d[N];
+int build() {
+    tot++;
+    tr[tot].lc = tr[tot].rc = 0;
+    tr[tot].val = 0;
+    tr[tot].siz = -1;
+    return tot;
+}
+int tim;
+long long query(int o, int l, int r, int wh, int opt) {
+  //if(tim==91)cout<<"query "<<o<<' '<<l<<' '<<r<<' '<<wh<<' '<<opt<<endl;
+    if(tr[o].siz == -1) tr[o].siz = r - l + 1;
+    --tr[o].siz;
+    //if(tim==91)cout<<o<<' '<<l<<' '<<r<<' '<<tr[o].siz<<endl;
+    if(l == r) {
+        if(opt) {
+            if(l < m) return 1ll * (x - 1) * m + l;
+            else return tr[o].val;
+        } else {
+            if(l <= n) return 1ll * l * m;
+            else return tr[o].val;
+        }      
+    }
+    if(!tr[o].lc) { 
+        tr[o].lc = build();
+        tr[tr[o].lc].siz = mid - l + 1;
+    }
+    if(wh <= tr[tr[o].lc].siz) { 
+        if(!tr[o].lc) tr[o].lc = build();
+        return query(lson, wh, opt);
+    } else {
+        if(!tr[o].rc) tr[o].rc = build();
+        return query(rson, wh - tr[tr[o].lc].siz, opt);
+    }
+}
+void insert(int o, int l, int r, int wh, long long v) {
+//   cout<<"insert "<<o<<' '<<l<<' '<<r<<' '<<wh<<' '<<v<<endl;
+    if(tr[o].siz == -1) tr[o].siz = r - l + 1;
+    if(l == r) {
+        tr[o].val = v;
+        return;
+    }
+    if(wh <= mid) {
+        if(!tr[o].lc) tr[o].lc = build();
+        insert(lson, wh, v);
+    } else {
+        if(!tr[o].rc) tr[o].rc = build();
+        insert(rson, wh, v);
+    }
+}
+int main() {
+    n = read(); m = read(); q = read();
+    M = m + q; rt = build();
+    for(int i = 1; i <= q; i++) {
+        x = read(); y = read();
+        if(y < m) {
+            if(!root[x]) root[x] = build();
+            long long ans = query(root[x], 1, M, y, 1);
+            printf("%lld\n", ans);
+            long long val = query(rt, 1, n + q, x, 0);
+            d[x]++; d[0]++;
+            insert(root[x], 1, M, m - 1 + d[x], val);
+            insert(rt, 1, n + q, n + d[0], ans);
+        } else {
+            long long ans = query(rt, 1, n + q, x, 0);
+            printf("%lld\n", ans);
+            d[0]++;
+            insert(rt, 1, n + q, n + d[0], ans);
         }
-        rotate(o,d^1);
-    }
-}
-void insert(Node* &o,int k){
-    if(o==NULL){o=new Node();o->ch[0]=o->ch[1]=NULL; o->v=k; o->maintain(); splay(root,k);}
-    else{
-        int d=o->cmp(k);
-        if(d==-1){o->cnt++;o->maintain();splay(root,k);}
-        else insert(o->ch[d],k);
-    }
-    //o->maintain();
-}
-int pre(Node*,int);
-void remove(int x){
-    splay(root,x);
-    if(root->cnt > 1){root->cnt--;return;}
-    if(root->ch[0]==NULL)root=root->ch[1];
-    else if(root->ch[1]==NULL)root=root->ch[0];
-    else{
-        int k=pre(root,x);
-        splay(root->ch[0],k);
-        Node* lc=root->ch[0];lc->ch[1]=root->ch[1];
-        lc->maintain();
-        root=lc;
-    }
-}
-int kth(Node* o,int k){
-    if(o==NULL || k<=0 || k>o->s)return 0;
-    int s=(o->ch[0]==NULL ? 0:o->ch[0]->s);
-    if(k>s && k<=s+o->cnt)return o->v;
-    else if(k<=s)return kth(o->ch[0],k);
-    else return kth(o->ch[1],k-s-o->cnt);
-}
-int Rank(Node* o,int x){
-    if(o==NULL)return 0;
-    int le=o->ch[0]==NULL ? o->cnt:o->ch[0]->s + o->cnt;
-    if(o->v==x)return le-o->cnt+1;
-    else if(o->v<x)return le+Rank(o->ch[1],x);
-    else if(o->v>x)return Rank(o->ch[0],x);
-}
-int pre(Node* o,int x){
-    int res=-INF;
-    while(o!=NULL){
-        if(o->v<x)res=o->v,o=o->ch[1];
-        else o=o->ch[0];
-    }return res;
-}
-int suf(Node* o,int x){
-    int res=INF;
-    while(o!=NULL){
-        if(o->v>x)res=o->v,o=o->ch[0];
-        else o=o->ch[1];
-    }return res;
-}
-void read(int &x){
-    x=0;int f=1;
-    char ch=getchar();
-    while(ch<'0'||ch>'9'){if(ch=='-')f=-1;ch=getchar();}
-    while(ch>='0'&&ch<='9'){x=x*10+ch-'0';ch=getchar();}
-    x*=f;
-}
-int main(){
-    int n;
-    read(n);
-    for(int i=1;i<=n;i++){
-        int opt,x;
-        read(opt),read(x);
-        if(opt==1)insert(root,x);
-        if(opt==2)remove(x);
-        if(opt==3){printf("%d\n",Rank(root,x));splay(root,x);}
-        if(opt==4)printf("%d\n",kth(root,x));
-        if(opt==5)printf("%d\n",pre(root,x));
-        if(opt==6)printf("%d\n",suf(root,x));
     }
     return 0;
 }
