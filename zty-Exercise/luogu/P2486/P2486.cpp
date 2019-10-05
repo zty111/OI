@@ -46,7 +46,7 @@ void dfs2(int u, int topf) {
 #define rt (o << 1 | 1)
 #define lson lt, l, mid
 #define rson rt, mid + 1, r
-int col[N << 2], lc[N << 2], rc[N << 2], sum[N << 2], ans1, ans2;
+int col[N << 2], lc[N << 2], rc[N << 2], sum[N << 2], ans1, ans2, LC, RC;
 inline void pushup(int o) {
     sum[o] = sum[lt] + sum[rt];
     if(rc[lt] == lc[rt]) sum[o]--;
@@ -80,6 +80,8 @@ void update(int o, int l, int r, int L, int R, int v) {
     pushup(o);
 }
 int query(int o, int l, int r, int L, int R) {
+    if(r == R) RC = rc[o];
+    if(l == L) LC = lc[o];
     if(L <= l && r <= R) {
         return sum[o];
     }
@@ -87,6 +89,7 @@ int query(int o, int l, int r, int L, int R) {
     int ans = 0;
     if(L <= mid) ans += query(lson, L, R);
     if(R > mid) ans += query(rson, L, R);
+    if(L <= mid && R > mid && rc[lt] == lc[rt]) ans--;
     return ans;
 }
 void updRange(int x, int y, int v) {
@@ -104,14 +107,14 @@ int qRange(int x, int y) {
     while(top[x] != top[y]) {
         if(dep[top[x]] < dep[top[y]]) swap(x, y), swap(ans1, ans2);
         ans += query(1, 1, n, id[top[x]], id[x]);
-        if(ans1 == lc[id[x]]) ans--;
-        ans1 = lc[id[top[x]]];
+        if(ans1 == RC) ans--;
+        ans1 = LC;
         x = f[top[x]];
     }
     if(dep[x] > dep[y]) swap(x, y), swap(ans1, ans2);
-    if(ans1 == lc[id[x]]) ans--;
-    if(ans2 == rc[id[y]]) ans--;
     ans += query(1, 1, n, id[x], id[y]);
+    if(ans1 == LC) ans--;
+    if(ans2 == RC) ans--;
     return ans;
 }
 int main() {
