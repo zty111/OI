@@ -54,7 +54,7 @@ int kth(Node * o, int k) {
 int Rank(Node * o, int x) {
     if(o == NULL) return 0;
     int le = o->ch[0] == NULL ? o->cnt: o->ch[0]->s + o->cnt;
-    if(o->v == x) return le - o->cnt + 1;
+    if(o->v == x) return le - o->cnt;
     else if(o->v < x) return le + Rank(o->ch[1], x);
     else if(o->v > x) return Rank(o->ch[0], x);
 }
