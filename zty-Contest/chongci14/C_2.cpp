@@ -9,7 +9,7 @@ inline int read() {
     while(ch >= '0' && ch <= '9') x = x * 10 + ch - 48, ch = getchar();
     return x;
 }
-const int N = 300010;
+const int N = 1000010;
 int n, a[N], c[N], m, s[N], ans[N], last[N];
 map<int, int> pos;
 struct qus{

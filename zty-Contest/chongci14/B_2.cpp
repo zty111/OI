@@ -6,8 +6,8 @@ using namespace std;
 const int N = 300010;
 typedef long long ll;
 typedef pair<int,int> pii;
-int n, p, x, y, d[N];
-map<pii,int> g;
+int n, p, x, y, d[N], c;
+map<pii, int> g;
 inline int read() {
     int x = 0; char ch = getchar();
     while(ch < '0' || ch > '9') ch = getchar();
@@ -19,18 +19,20 @@ int main() {
     for(int i = 1; i <= n; i++) {
         x = read(); y = read();
         if(x > y) swap(x, y);
-        d[x]++; d[y]++; g[pii(x,y)]++;
+        d[x]++; d[y]++;
+        g[pii(x,y)]++;
     }
     ll ans = 0;
-    for(auto it:g) {
+    for(auto it : g) {
         int x = it.first.first, y = it.first.second;
         if(d[x] + d[y] >= p && d[x] + d[y] - it.second < p) --ans;
     }
     sort(d+1, d+1+n);
     int now = n;
     for(int i = 1; i <= n; i++) {
-        while(now > i && d[now] + d[i] >= p) ++ans;
+        while(now > i && d[now] + d[i] >= p) --now;
         ans += n - max(i, now);
     }
     printf("%lld\n", ans);
+    return 0;
 }
