@@ -2,23 +2,21 @@
 #include <iostream>
 using namespace std;
 const int N = 100010;
-int dfn[N], low[N], h[N], nxt[N], to[N], cnt, num, cut[N], root;
+int dfn[N], low[N], h[N], nxt[N], to[N], cnt = 1, num, bridge[N];
 void add_edge(int u, int v) {
     ++cnt; nxt[cnt] = h[u]; h[u] = cnt; to[cnt] = v;
 }
-void tarjan(int x) {
+void tarjan(int x, int in_edge) {
     dfn[x] = low[x] = ++num;
-    int flag = 0;
     for(int i = h[x]; i; i = nxt[i]) {
         int y = to[i];
         if(!dfn[y]) {
-            tarjan(y);
+            tarjan(y, i);
             low[x] = min(low[x], low[y]);
-            if(low[y] >= dfn[x]) {
-                flag++;
-                if(x != root || flag > 1) cut[x] = 1;
-            }
-        } else low[x] = min(low[x], dfn[y]);
+            if(low[y] > dfn[x])
+                bridge[i] = bridge[i^1] = true;
+        } else if(i != (in_edge ^ 1))
+            low[x] = min(low[x], dfn[y]);
     }
 }
 inline char nc(){
@@ -35,12 +33,11 @@ int main() {
     int n = read(), m = read();
     for(int i = 1; i <= m; i++) {
         int x = read(), y = read();
-        if(x == y) continue;
         add_edge(x, y); add_edge(y, x);
     }
     for(int i = 1; i <= n; i++)
-        if(!dfn[i]) root = i, tarjan(i);
-    for(int i = 1; i <= n; i ++)
-        if(cut[i]) printf("%d ", i);
+        if(!dfn[i]) tarjan(i, 0);
+    for(int i = 2; i < cnt; i += 2)
+        if(bridge[i]) printf("%d %d\n", to[i^1], to[i]);
     return 0;
 }
