@@ -1,4 +1,6 @@
-#include<bits/stdc++.h>
+#include <cstdio>
+#include <iostream>
+#include <cmath>
 using namespace std;
 int n, q, m, p, b;
 inline char nc(){
@@ -11,7 +13,7 @@ inline int read(){
     while(ch >= '0' && ch <= '9') x = (x<<3) + (x<<1) + ch - 48, ch = nc();
     return x * f;
 }
-int qpow(int a, long long b, int m){
+int qpow(int a, int b, int m){
     int r = 1; a %= m;
     while(b) {
         if(b&1) r = 1ll * r * a % m;
@@ -33,7 +35,7 @@ int pll(int a){
 int mod;
 struct Matrix {
     int a[3][3];
-    Matrix() { memset(a, 0, sizeof a); } // 构造函数，矩阵初始化全零
+    Matrix() { memset(a, 0, sizeof a); } 
     Matrix operator*(const Matrix &b) const {
         Matrix res;
         for (int i = 1; i <= 2; ++i)
@@ -43,11 +45,11 @@ struct Matrix {
         return res;
     }
 } ans, base;
-void init() { // 初始化 ans、base 矩阵
-    base.a[1][1] = base.a[1][2] = base.a[2][1] = 1;
-    ans.a[1][1] = ans.a[1][2] = 1;
+void init() {
+    base.a[1][1] = base.a[1][2] = base.a[2][1] = 1; base.a[2][2] = 0;
+    ans.a[1][1] = ans.a[1][2] = 1; ans.a[2][2] = ans.a[2][1] = 0;
 }
-void qpow2(int b) { // 求
+void qpow2(int b) {
     while (b) {
         if (b & 1) ans = ans * base;
         base = base * base;

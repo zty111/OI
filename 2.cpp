@@ -15,21 +15,23 @@ inline int read(){
     return x * f;
 }
 const int N = 1000010;
-int c[N], nxt[N], h[N], to[N], cnt, dis[N], r[N], d[N];
+int c[N], nxt[N], h[N], to[N], cnt, dis[N], r[N], d[N], siz[N];
 void add_edge(int u, int v) {
     cnt++; nxt[cnt] = h[u]; to[cnt] = v; h[u] = cnt;
 }
 void dfs(int u, int fa) {
+    siz[u] = 1;
+    d[u] = c[u] + dis[u];
     for(int i = h[u]; i; i = nxt[i]) {
         int v = to[i];
         if(v == fa) continue;
-        dfs(v, u);
         dis[v] = dis[u] + 1;
-        d[v] = c[v] + dis[v];
+        dfs(v, u);
+        siz[u] += siz[v];
     }
 }
 bool cmp(int a, int b) {
-    return d[a] > d[b];
+    return d[a] + (siz[b] - 1) * 2 > d[b] + (siz[a] - 1) * 2;
 }
 int tim, tot;
 void dfs2(int u, int fa) {

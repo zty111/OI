@@ -2,14 +2,12 @@
 #include <cstdlib>
 #include <iostream>
 using namespace std;
-const int A = 500000, B = 1e9;
 int main() {
-    int n = A;
-    cout<<n<<endl;
-    for(int i = 1; i <= n; i++) cout<<B<<' ';
-    cout<<endl;
-    for(int i = 2; i <= n; i++) {
-        cout<<1<<' '<<i<<endl;
+    int m = 5000, p = 998244353;
+    cout<<m<<' '<<p<<endl;
+    for(int i = 1; i <= m; i++) {
+        int n = rand(), q = rand() % p;
+        cout<<n<<' '<<q<<endl;
     }
     return 0;
 }
